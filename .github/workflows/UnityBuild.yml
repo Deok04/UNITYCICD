@@ -9,21 +9,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Cache Unity Library Folder
-        uses: actions/cache@v3
-        with:
-          path: Library
-          key: ${{ runner.os }}-unity-${{ hashFiles('**/Library') }}
-          restore-keys: |
-            ${{ runner.os }}-unity-
-
-      - name: Setup Docker Environment
-        run: |
-          sudo systemctl start docker
-          docker info
-
       - name: Pull Unity Editor Docker Image
-        run: docker pull unityci/editor:ubuntu-latest
+        run: docker pull unityci/editor:ubuntu-2022.3.47f1-base-0  # 가정된 태그, 실제 태그 확인 필요
 
       - name: Run Unity Build
         uses: game-ci/unity-builder@v2
@@ -31,7 +18,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           targetPlatform: Android
-          unityVersion: auto
+          unityVersion: '2022.3.47f1'
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
