@@ -1,33 +1,46 @@
-name: Build Unity Project
+name: Unity Build Workflow
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 코드 체크아웃
-        uses: actions/checkout@v3  # 최신 버전으로 업데이트
+    name: Build Unity Project on Ubuntu
+    runs-on: ubuntu-latest  # 곧 Ubuntu 24.04로 업데이트될 예정
 
-      - name: 유니티 라이브러리 캐시
-        uses: actions/cache@v3  # 최신 버전으로 업데이트
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Cache Unity Library Folder
+        uses: actions/cache@v3
         with:
           path: Library
-          key: ${{ runner.os }}-library-${{ hashFiles('**/Library') }}
+          key: ${{ runner.os }}-unity-${{ hashFiles('**/Library') }}
           restore-keys: |
-            ${{ runner.os }}-library-
+            ${{ runner.os }}-unity-
 
-      - name: 유니티 프로젝트 빌드
+      - name: Set up Docker Environment
+        run: |
+          sudo systemctl start docker
+          docker info
+
+      - name: Pull Unity Editor Docker Image
+        run: docker pull unityci/editor:ubuntu-latest  # Unity CI용 Docker 이미지를 사용합니다.
+
+      - name: Run Unity Build
         uses: game-ci/unity-builder@v2
         env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          targetPlatform: StandaloneWindows64
+          targetPlatform: Android
+          unityVersion: auto
 
-      - name: 아티팩트 업로드
-        uses: actions/upload-artifact@v3  # 최신 버전으로 업데이트
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: Build
+          name: Build-Artifacts
           path: build/
