@@ -1,7 +1,7 @@
 name: UnityBuildTest
 
 on:
-  workflow_dispatch:  # 이 이벤트 트리거는 수동 실행을 허용합니다.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,33 +11,35 @@ permissions:
 jobs:
   buildForAndroid:
     name: Build Android🛸🛸🛸
-    runs-on: ubuntu-latest  # 가장 최신의 Ubuntu 가상 환경에서 실행합니다.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check Out Code
-        uses: actions/checkout@v4  # GitHub 저장소에서 코드를 체크아웃합니다.
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 모든 이력을 가져옵니다.
-          lfs: true  # Git Large File Storage를 사용합니다.
+          fetch-depth: 0
+          lfs: true
 
       - name: Cache Library
-        uses: actions/cache@v4.0.2  # Unity 라이브러리 캐시를 설정합니다.
-        with:
+        uses: actions/cache@v4.0.2
+        with: 
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
 
       - name: Unity Build
-        uses: game-ci/unity-builder@v4  # Unity 빌드를 수행합니다.
+        uses: game-ci/unity-builder@v4
         env:
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}  # GitHub Secrets에서 Unity 시리얼 번호를 가져옵니다.
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }} # Pro/Plus 라이선스 사용 시 제거 가능
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }} # Pro/Plus 라이선스 사용 시 제거 가능
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }} # Personal 라이선스 사용 시 제거 가능
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }} # 필요한 경우 추가
         with:
-          targetPlatform: Android  # 타겟 플랫폼은 Android로 설정합니다.
-
+          targetPlatform: Android
+      
       - name: Upload Build File
-        uses: actions/upload-artifact@v3  # 빌드 파일을 아티팩트로 업로드합니다.
+        uses: actions/upload-artifact@v3
         with:
           name: Build-Android
           path: build
-
