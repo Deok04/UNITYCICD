@@ -1,45 +1,33 @@
-name: UnityBuildTest
+name: Build Unity Project
 
-on:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  id-token: write
-  issues: write
+on: [push, workflow_dispatch]
 
 jobs:
-  buildForAndroid:
-    name: Build Android🛸🛸🛸
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check Out Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          lfs: true
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Cache Library
-        uses: actions/cache@v4.0.2
-        with: 
+      - name: Cache Unity Library
+        uses: actions/cache@v2
+        with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: ${{ runner.os }}-library-${{ hashFiles('**/Library') }}
           restore-keys: |
-            Library-
+            ${{ runner.os }}-library-
 
-      - name: Unity Build
-        uses: game-ci/unity-builder@v4
+      - name: Build Unity Project
+        uses: game-ci/unity-builder@v2
         env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }} # Pro/Plus 라이선스 사용 시 제거 가능
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }} # Pro/Plus 라이선스 사용 시 제거 가능
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }} # Personal 라이선스 사용 시 제거 가능
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }} # 필요한 경우 추가
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
-          targetPlatform: Android
-      
-      - name: Upload Build File
-        uses: actions/upload-artifact@v3
+          targetPlatform: StandaloneWindows64
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: Build-Android
-          path: build
+          name: Build
+          path: build/
