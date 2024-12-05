@@ -1,16 +1,10 @@
-name: Unity Build Workflow
+name: Build Unity Project
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
   build:
-    name: Build Unity Project on Ubuntu
-    runs-on: ubuntu-latest  # 곧 Ubuntu 24.04로 업데이트될 예정
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -23,13 +17,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-unity-
 
-      - name: Set up Docker Environment
+      - name: Setup Docker Environment
         run: |
           sudo systemctl start docker
           docker info
 
       - name: Pull Unity Editor Docker Image
-        run: docker pull unityci/editor:ubuntu-latest  # Unity CI용 Docker 이미지를 사용합니다.
+        run: docker pull unityci/editor:ubuntu-latest
 
       - name: Run Unity Build
         uses: game-ci/unity-builder@v2
