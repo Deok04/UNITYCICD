@@ -6,7 +6,8 @@ on:
 permissions: write-all
   
 jobs:
-  buildForAndroid:
+  buildForAndroid: 
+    name: Build Android🛸🛸🛸
     runs-on: ubuntu-latest
     steps:
       - name: Check Out
@@ -17,7 +18,7 @@ jobs:
 
       - name: Cache Library
         uses: actions/cache@v4.0.2
-        with:
+        with: 
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
@@ -26,7 +27,9 @@ jobs:
       - name: Unity Build
         uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}  # 이 부분 확인
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}  # 필요한 경우 추가
         with:
           targetPlatform: Android
       
