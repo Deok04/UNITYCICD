@@ -16,11 +16,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Unity Activation
-        uses: game-ci/unity-request-activation-file@v2
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Cache Library
         uses: actions/cache@v3
         with:
