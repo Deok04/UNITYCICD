@@ -2,11 +2,9 @@ name: Unity Build Workflow
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -16,18 +14,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Cache Library
+      - name: Cache Unity Library
         uses: actions/cache@v3
         with:
-          path: |
-            ${{ github.workspace }}/Library
-          key: Library-${{ runner.os }}-${{ hashFiles('**/ProjectSettings/*') }}
+          path: Library
+          key: ${{ runner.os }}-unity-${{ hashFiles('**/Library') }}
+
+      - name: Setup Unity License
+        uses: game-ci/unity-activate@v2
+        with:
+          license: ${{ secrets.UNITY_LICENSE }}
 
       - name: Run Unity Build
         uses: game-ci/unity-builder@v2
         with:
           targetPlatform: Android
-          projectPath: .
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
