@@ -1,37 +1,46 @@
-name: Unity Build Workflow
+name: UnityBuildTest
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
+permissions: write-all
+  
 jobs:
-  build:
+  #Job 설정
+  buildForAndroid: 
+    name: Build Android🛸🛸🛸
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
 
-      - name: Cache Unity Library
-        uses: actions/cache@v3
+      # Step1 - Check Out
+      - name: Check Out
+        uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+          lfs: true
+
+      # Step2 - Cache Library
+      - name: Cache Library
+        uses: actions/cache@v4.0.2
+        with: 
           path: Library
-          key: ${{ runner.os }}-unity-${{ hashFiles('**/Library') }}
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
 
-      - name: Setup Unity License
-        uses: game-ci/unity-activate@v2
-        with:
-          license: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Run Unity Build
-        uses: game-ci/unity-builder@v2
+      # Step3 - Unity Build
+      - name: Unity Build
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: Android
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+      
+      # Step4 - Upload Build File
+      - name: Upload Build File
+      - uses: actions/upload-artifact@v3
         with:
-          name: build-artifacts
-          path: build/
+          name: Build-Android
+          path: build
